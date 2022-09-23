@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:info_safety_lab1/pages/home_page.dart';
+import 'package:info_safety_lab1/pages/entrance_page.dart';
 
 void main() {
   runApp(const App());
@@ -14,7 +14,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: const EntrancePage(),
     );
   }
 }

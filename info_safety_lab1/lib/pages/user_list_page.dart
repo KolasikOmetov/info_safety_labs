@@ -27,9 +27,11 @@ class _Content extends StatelessWidget {
   }) : super(key: key);
 
   _onLimitPressed(BuildContext context, UserModel user) {
-    if (user.isPasswordChoosingLimited) {
-      context.userListController.set(user);
-    }
+    context.userListController.setUserLimit(user, !user.isPasswordChoosingLimited);
+  }
+
+  _onBlockPressed(BuildContext context, UserModel user) {
+    context.userListController.setUserBlock(user, !user.isBlocked);
   }
 
   @override
@@ -45,11 +47,11 @@ class _Content extends StatelessWidget {
               trailing: Row(
                 children: <Widget>[
                   OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () => _onBlockPressed(context, user),
                     child: Text(user.isBlocked ? 'Unblock' : 'Block'),
                   ),
                   OutlinedButton(
-                    onPressed: () => _onLimitPressed(user),
+                    onPressed: () => _onLimitPressed(context, user),
                     child: Text(user.isPasswordChoosingLimited ? 'Unlimit Passwords' : 'Limit Passwords'),
                   ),
                 ],
