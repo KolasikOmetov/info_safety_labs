@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 Future<void> moveTo(BuildContext context, Widget page) {
   return Navigator.of(context).push<void>(
@@ -7,3 +8,5 @@ Future<void> moveTo(BuildContext context, Widget page) {
     ),
   );
 }
+
+void exitProgram() => SystemChannels.platform.invokeMethod('SystemNavigator.pop');

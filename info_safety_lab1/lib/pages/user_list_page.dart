@@ -36,30 +36,44 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserListController>(
-      builder: (BuildContext context, UserListController value, Widget? child) {
-        return ListView.builder(
-          itemCount: value.users.length,
-          itemBuilder: (BuildContext context, int index) {
-            final UserModel user = value.users[index];
-            return ListTile(
-              title: Text(user.name),
-              trailing: Row(
-                children: <Widget>[
-                  OutlinedButton(
-                    onPressed: () => _onBlockPressed(context, user),
-                    child: Text(user.isBlocked ? 'Unblock' : 'Block'),
-                  ),
-                  OutlinedButton(
-                    onPressed: () => _onLimitPressed(context, user),
-                    child: Text(user.isPasswordChoosingLimited ? 'Unlimit Passwords' : 'Limit Passwords'),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
+    return Column(
+      children: [
+        Positioned(
+          top: 0,
+          bottom: 0,
+          child: Consumer<UserListController>(
+            builder: (BuildContext context, UserListController value, Widget? child) {
+              return ListView.builder(
+                itemCount: value.users.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final UserModel user = value.users[index];
+                  return ListTile(
+                    title: Text(user.name),
+                    trailing: Row(
+                      children: <Widget>[
+                        OutlinedButton(
+                          onPressed: () => _onBlockPressed(context, user),
+                          child: Text(user.isBlocked ? 'Unblock' : 'Block'),
+                        ),
+                        OutlinedButton(
+                          onPressed: () => _onLimitPressed(context, user),
+                          child: Text(user.isPasswordChoosingLimited ? 'Unlimit Passwords' : 'Limit Passwords'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        Positioned(
+          child: OutlinedButton(
+            onPressed: () => _,
+            child: const Text('Add user'),
+          ),
+        )
+      ],
     );
   }
 }

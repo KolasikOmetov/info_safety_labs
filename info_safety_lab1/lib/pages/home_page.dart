@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:info_safety_lab1/controllers/user_controller.dart';
 import 'package:info_safety_lab1/model/user_model.dart';
 import 'package:info_safety_lab1/pages/user_list_page.dart';
+import 'package:info_safety_lab1/utils/context_x.dart';
 import 'package:info_safety_lab1/utils/utils.dart';
 import 'package:provider/provider.dart';
 
@@ -27,9 +27,11 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.userController.user;
+    final bool isAdmin = currentUser is AdminModel;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('userMode: ' "ADMIN"),
+        title: Text('user: ${isAdmin ? "ADMIN" : currentUser.name}'),
       ),
       body: Center(
         child: Column(
@@ -38,12 +40,13 @@ class _Content extends StatelessWidget {
               onPressed: () {},
               child: const Text('Change Password'),
             ),
+            if (isAdmin)
+              OutlinedButton(
+                onPressed: () => moveTo(context, const UserListPage()),
+                child: const Text('Open Userlist'),
+              ),
             OutlinedButton(
-              onPressed: () => moveTo(context, const UserListPage()),
-              child: const Text('Open Userlist'),
-            ),
-            OutlinedButton(
-              onPressed: () => SystemChannels.platform.invokeMethod('SystemNavigator.pop'),
+              onPressed: () => exitProgram(),
               child: const Text('Exit'),
             ),
           ],
