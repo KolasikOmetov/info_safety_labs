@@ -8,7 +8,7 @@ class EntranceController extends ChangeNotifier {
   static const _maxAttempts = 3;
   String userName = '';
   String password = '';
-  final List<UserModel> users = [const UserModel(name: 'FUF')];
+  final List<UserModel> users = [const AdminModel(name: 'Admin')];
 
   int wrongAttempts = 0;
 

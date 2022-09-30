@@ -35,6 +35,7 @@ class _Content extends StatelessWidget {
       ),
       body: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             OutlinedButton(
               onPressed: () {},

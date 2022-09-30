@@ -30,8 +30,9 @@ class UserModel {
 
 class AdminModel extends UserModel {
   const AdminModel({
+    required super.name,
     super.isBlocked = false,
     super.isPasswordChoosingLimited = false,
     super.password = const PasswordModel(),
-  }) : super(name: 'admin');
+  });
 }

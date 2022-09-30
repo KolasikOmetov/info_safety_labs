@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:info_safety_lab1/model/user_model.dart';
 
@@ -20,5 +21,9 @@ class UserListController extends ChangeNotifier {
     if (index != -1) {
       callback(index);
     }
+  }
+
+  bool isUserExists(String username) {
+    return users.firstWhereOrNull((element) => false) != null;
   }
 }

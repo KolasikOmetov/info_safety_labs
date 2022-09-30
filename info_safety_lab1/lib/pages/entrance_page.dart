@@ -27,34 +27,42 @@ class _Content extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('userMode: ' "ADMIN"),
+        title: const Text('Login'),
       ),
       body: Center(
-        child: Column(
-          children: <Widget>[
-            TextField(
-              onChanged: (value) => context.entranceController.setUsername(value),
-              decoration: const InputDecoration(
-                hintText: "Username",
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                onChanged: (value) => context.entranceController.setUsername(value),
+                decoration: const InputDecoration(
+                  hintText: "Username",
+                ),
               ),
-            ),
-            TextField(
-              onChanged: (value) => context.entranceController.setPassword(value),
-              obscuringCharacter: '*',
-              obscureText: true,
-              decoration: const InputDecoration(
-                hintText: "Password",
+              TextField(
+                onChanged: (value) => context.entranceController.setPassword(value),
+                obscuringCharacter: '*',
+                obscureText: true,
+                decoration: const InputDecoration(
+                  hintText: "Password",
+                ),
               ),
-            ),
-            OutlinedButton(
-              onPressed: () => context.entranceController.checkData(
-                onSuccess: (UserModel user) => moveTo(context, HomePage(user: user)),
-                onUserNotExists: () => const ScaffoldMessenger(child: Text('User not exists')),
-                onPasswordWrong: () => const ScaffoldMessenger(child: Text('Password is wrong')),
+              OutlinedButton(
+                onPressed: () => context.entranceController.checkData(
+                  onSuccess: (UserModel user) => moveTo(context, HomePage(user: user)),
+                  onUserNotExists: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('User not exists')),
+                  ),
+                  onPasswordWrong: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Password is wrong')),
+                  ),
+                ),
+                child: const Text('Submit'),
               ),
-              child: const Text('Submit'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

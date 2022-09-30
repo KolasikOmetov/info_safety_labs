@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:info_safety_lab1/controllers/user_list_controller.dart';
 import 'package:info_safety_lab1/model/user_model.dart';
 import 'package:info_safety_lab1/utils/context_x.dart';
+import 'package:info_safety_lab1/widgets/dialogs/add_user_dialog.dart';
 import 'package:provider/provider.dart';
 
 class UserListPage extends StatelessWidget {
@@ -17,6 +18,7 @@ class UserListPage extends StatelessWidget {
         create: (_) => UserListController(),
         child: const _Content(),
       ),
+      resizeToAvoidBottomInset: false,
     );
   }
 }
@@ -34,42 +36,56 @@ class _Content extends StatelessWidget {
     context.userListController.setUserBlock(user, !user.isBlocked);
   }
 
+  _addUser(BuildContext context) {
+    AddUserDialog.show(context, isExists: (username) => context.userListController.isUserExists(username));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
+      fit: StackFit.expand,
       children: [
         Positioned(
           top: 0,
           bottom: 0,
-          child: Consumer<UserListController>(
-            builder: (BuildContext context, UserListController value, Widget? child) {
-              return ListView.builder(
-                itemCount: value.users.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final UserModel user = value.users[index];
-                  return ListTile(
-                    title: Text(user.name),
-                    trailing: Row(
-                      children: <Widget>[
-                        OutlinedButton(
-                          onPressed: () => _onBlockPressed(context, user),
-                          child: Text(user.isBlocked ? 'Unblock' : 'Block'),
-                        ),
-                        OutlinedButton(
-                          onPressed: () => _onLimitPressed(context, user),
-                          child: Text(user.isPasswordChoosingLimited ? 'Unlimit Passwords' : 'Limit Passwords'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+          left: 0,
+          right: 0,
+          child: Consumer<UserListController>(builder: (BuildContext context, UserListController value, Widget? child) {
+            final users = value.users;
+            if (users.isEmpty) {
+              return const Center(
+                child: Text('Empty User List'),
               );
-            },
-          ),
+            }
+            return ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (BuildContext context, int index) {
+                final UserModel user = users[index];
+                return ListTile(
+                  title: Text(user.name),
+                  trailing: Row(
+                    children: <Widget>[
+                      OutlinedButton(
+                        onPressed: () => _onBlockPressed(context, user),
+                        child: Text(user.isBlocked ? 'Unblock' : 'Block'),
+                      ),
+                      OutlinedButton(
+                        onPressed: () => _onLimitPressed(context, user),
+                        child: Text(user.isPasswordChoosingLimited ? 'Unlimit Passwords' : 'Limit Passwords'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }),
         ),
         Positioned(
+          bottom: 20,
+          left: 20,
+          right: 20,
           child: OutlinedButton(
-            onPressed: () => _,
+            onPressed: () => _addUser(context),
             child: const Text('Add user'),
           ),
         )
