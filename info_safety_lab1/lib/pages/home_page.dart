@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:info_safety_lab1/controllers/user_controller.dart';
 import 'package:info_safety_lab1/model/user_model.dart';
+import 'package:info_safety_lab1/pages/change_password_page.dart';
 import 'package:info_safety_lab1/pages/user_list_page.dart';
 import 'package:info_safety_lab1/utils/context_x.dart';
 import 'package:info_safety_lab1/utils/utils.dart';
@@ -38,7 +39,7 @@ class _Content extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             OutlinedButton(
-              onPressed: () {},
+              onPressed: () => moveTo(context, const ChangePasswordPage()),
               child: const Text('Change Password'),
             ),
             if (isAdmin)

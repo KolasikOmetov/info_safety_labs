@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:info_safety_lab1/model/user_model.dart';
 
 class UserListController extends ChangeNotifier {
-  final List<UserModel> users = [];
+  final List<UserModel> users = [const AdminModel(name: 'Admin')];
 
   void setUserLimit(UserModel user, bool isPasswordChoosingLimited) {
     checkUserExists(
@@ -25,5 +25,10 @@ class UserListController extends ChangeNotifier {
 
   bool isUserExists(String username) {
     return users.firstWhereOrNull((element) => false) != null;
+  }
+
+  void addNewUserByName(String newUserName) {
+    users.add(UserModel(name: newUserName));
+    notifyListeners();
   }
 }

@@ -5,8 +5,8 @@ class AddUserDialog extends StatefulWidget {
 
   final bool Function(String username) isExists;
 
-  static void show(BuildContext context, {required bool Function(String username) isExists}) {
-    showDialog(
+  static Future<String?> show(BuildContext context, {required bool Function(String username) isExists}) {
+    return showDialog<String>(
         context: context,
         builder: (BuildContext context) => AddUserDialog(
               isExists: isExists,

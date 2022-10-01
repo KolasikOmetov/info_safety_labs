@@ -12,7 +12,7 @@ class EntrancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => EntranceController(),
+      create: (_) => EntranceController(context.userListController),
       child: const _Content(),
     );
   }
@@ -54,6 +54,9 @@ class _Content extends StatelessWidget {
                   onSuccess: (UserModel user) => moveTo(context, HomePage(user: user)),
                   onUserNotExists: () => ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('User not exists')),
+                  ),
+                  onUserBlocked: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('User was blocked')),
                   ),
                   onPasswordWrong: () => ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Password is wrong')),

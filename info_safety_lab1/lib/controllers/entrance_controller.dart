@@ -1,14 +1,18 @@
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:info_safety_lab1/constants.dart';
+import 'package:info_safety_lab1/controllers/user_list_controller.dart';
 import 'package:info_safety_lab1/model/user_model.dart';
 import 'package:info_safety_lab1/utils/utils.dart';
 
 class EntranceController extends ChangeNotifier {
-  static const _maxAttempts = 3;
+  EntranceController(this._userListController);
+
+  final UserListController _userListController;
   String userName = '';
   String password = '';
-  final List<UserModel> users = [const AdminModel(name: 'Admin')];
+  List<UserModel> get users => _userListController.users;
 
   int wrongAttempts = 0;
 
@@ -18,6 +22,7 @@ class EntranceController extends ChangeNotifier {
   void checkData({
     required void Function(UserModel user) onSuccess,
     void Function()? onUserNotExists,
+    void Function()? onUserBlocked,
     void Function()? onPasswordWrong,
     void Function()? onAccessDenied,
   }) {
@@ -27,12 +32,16 @@ class EntranceController extends ChangeNotifier {
       return;
     }
 
+    if (user.isBlocked) {
+      onUserBlocked?.call();
+      return;
+    }
+
     if (user.password.text != password) {
       wrongAttempts++;
-      if (wrongAttempts == _maxAttempts) {
+      if (wrongAttempts == Constants.maxAttempts) {
         onAccessDenied?.call();
-        Future<void>.delayed(const Duration(seconds: 3));
-        exitProgram();
+        Future<void>.delayed(const Duration(seconds: 3), () => exitProgram());
       } else {
         onPasswordWrong?.call();
       }

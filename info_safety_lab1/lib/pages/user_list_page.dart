@@ -14,10 +14,7 @@ class UserListPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('User List'),
       ),
-      body: ChangeNotifierProvider(
-        create: (_) => UserListController(),
-        child: const _Content(),
-      ),
+      body: const _Content(),
       resizeToAvoidBottomInset: false,
     );
   }
@@ -36,8 +33,13 @@ class _Content extends StatelessWidget {
     context.userListController.setUserBlock(user, !user.isBlocked);
   }
 
-  _addUser(BuildContext context) {
-    AddUserDialog.show(context, isExists: (username) => context.userListController.isUserExists(username));
+  _addUser(BuildContext context) async {
+    final UserListController userListController = context.userListController;
+    final String? newUserName =
+        await AddUserDialog.show(context, isExists: (username) => userListController.isUserExists(username));
+    if (newUserName != null) {
+      userListController.addNewUserByName(newUserName);
+    }
   }
 
   @override
@@ -61,20 +63,35 @@ class _Content extends StatelessWidget {
               itemCount: users.length,
               itemBuilder: (BuildContext context, int index) {
                 final UserModel user = users[index];
-                return ListTile(
-                  title: Text(user.name),
-                  trailing: Row(
-                    children: <Widget>[
-                      OutlinedButton(
-                        onPressed: () => _onBlockPressed(context, user),
-                        child: Text(user.isBlocked ? 'Unblock' : 'Block'),
+                return Row(
+                  children: <Widget>[
+                    Expanded(
+                        child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: SelectableText(user.name),
+                    )),
+                    if (user is! AdminModel)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: OutlinedButton(
+                          onPressed: () => _onBlockPressed(context, user),
+                          child: Text(user.isBlocked ? 'Unblock' : 'Block'),
+                        ),
                       ),
-                      OutlinedButton(
-                        onPressed: () => _onLimitPressed(context, user),
-                        child: Text(user.isPasswordChoosingLimited ? 'Unlimit Passwords' : 'Limit Passwords'),
+                    if (user is! AdminModel)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: OutlinedButton(
+                          onPressed: () => _onLimitPressed(context, user),
+                          child: Text(user.isPasswordChoosingLimited ? 'Unlimit Passwords' : 'Limit Passwords'),
+                        ),
                       ),
-                    ],
-                  ),
+                    if (user is AdminModel)
+                      const Padding(
+                        padding: EdgeInsets.only(right: 20),
+                        child: Text('Admin Account'),
+                      ),
+                  ],
                 );
               },
             );
