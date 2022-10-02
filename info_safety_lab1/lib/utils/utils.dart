@@ -10,3 +10,9 @@ Future<void> moveTo(BuildContext context, Widget page) {
 }
 
 void exitProgram() => SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+
+void showSnack(BuildContext context, String text) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(text)),
+  );
+}

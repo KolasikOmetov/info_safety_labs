@@ -41,12 +41,13 @@ class ChangePasswordController extends ChangeNotifier {
       return;
     }
 
-    if (_user.isPasswordChoosingLimited) {
-      // TODO
+    if (_user.isPasswordChoosingLimited && _userController.isNotValidPasswordLimit(newPassword)) {
       onPasswordsLimits?.call();
       return;
     }
 
+    // TODO
+    // _userController.setPassword(newPassword);
     onSuccess();
   }
 }

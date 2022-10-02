@@ -5,4 +5,8 @@ class UserController extends ChangeNotifier {
   UserController(this.user);
 
   final UserModel user;
+
+  bool isNotValidPasswordLimit(String password) => !(RegExp(r'[0-9]').hasMatch(password) &&
+      RegExp(r'[.,!?:;]').hasMatch(password) &&
+      RegExp(r'[+\-*\/^]').hasMatch(password));
 }

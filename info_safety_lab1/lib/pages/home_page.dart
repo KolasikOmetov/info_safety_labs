@@ -39,7 +39,11 @@ class _Content extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             OutlinedButton(
-              onPressed: () => moveTo(context, const ChangePasswordPage()),
+              onPressed: () => moveTo(
+                  context,
+                  ChangePasswordPage(
+                    userController: context.userController,
+                  )),
               child: const Text('Change Password'),
             ),
             if (isAdmin)
