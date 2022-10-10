@@ -2,13 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:info_safety_lab1/constants.dart';
 import 'package:info_safety_lab1/controllers/user_controller.dart';
+import 'package:info_safety_lab1/controllers/user_list_controller.dart';
 import 'package:info_safety_lab1/model/user_model.dart';
 import 'package:info_safety_lab1/utils/utils.dart';
 
 class ChangePasswordController extends ChangeNotifier {
-  ChangePasswordController(this._userController);
+  ChangePasswordController(this._userController, this._userListController);
 
   final UserController _userController;
+  final UserListController _userListController;
   UserModel get _user => _userController.user;
   String oldPassword = '';
   String newPassword = '';
@@ -46,8 +48,7 @@ class ChangePasswordController extends ChangeNotifier {
       return;
     }
 
-    // TODO
-    // _userController.setPassword(newPassword);
+    _userListController.setPassword(_user, newPassword);
     onSuccess();
   }
 }

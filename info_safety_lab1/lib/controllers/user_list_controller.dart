@@ -31,4 +31,10 @@ class UserListController extends ChangeNotifier {
     users.add(UserModel(name: newUserName));
     notifyListeners();
   }
+
+  void setPassword(UserModel user, String password) {
+    checkUserExists(
+        user, (int index) => users[index] = user.copyWith(password: user.password.copyWith(text: password)));
+    notifyListeners();
+  }
 }

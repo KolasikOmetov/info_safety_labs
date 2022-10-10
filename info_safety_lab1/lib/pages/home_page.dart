@@ -43,6 +43,7 @@ class _Content extends StatelessWidget {
                   context,
                   ChangePasswordPage(
                     userController: context.userController,
+                    userListController: context.userListController,
                   )),
               child: const Text('Change Password'),
             ),
