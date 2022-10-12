@@ -70,7 +70,7 @@ class _Content extends StatelessWidget {
                       padding: const EdgeInsets.all(20),
                       child: SelectableText(user.name),
                     )),
-                    if (user is! AdminModel)
+                    if (!user.isAdmin)
                       Padding(
                         padding: const EdgeInsets.only(right: 20),
                         child: OutlinedButton(
@@ -78,7 +78,7 @@ class _Content extends StatelessWidget {
                           child: Text(user.isBlocked ? 'Unblock' : 'Block'),
                         ),
                       ),
-                    if (user is! AdminModel)
+                    if (!user.isAdmin)
                       Padding(
                         padding: const EdgeInsets.only(right: 20),
                         child: OutlinedButton(
@@ -86,7 +86,7 @@ class _Content extends StatelessWidget {
                           child: Text(user.isPasswordChoosingLimited ? 'Unlimit Passwords' : 'Limit Passwords'),
                         ),
                       ),
-                    if (user is AdminModel)
+                    if (user.isAdmin)
                       const Padding(
                         padding: EdgeInsets.only(right: 20),
                         child: Text('Admin Account'),

@@ -51,7 +51,12 @@ class _Content extends StatelessWidget {
               ),
               OutlinedButton(
                 onPressed: () => context.entranceController.checkData(
-                  onSuccess: (UserModel user) => moveTo(context, HomePage(user: user)),
+                  onSuccess: (UserModel user) => moveTo(
+                      context,
+                      HomePage(
+                        userListController: context.userListController,
+                        userName: user.name,
+                      )),
                   onUserNotExists: () => ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('User not exists')),
                   ),

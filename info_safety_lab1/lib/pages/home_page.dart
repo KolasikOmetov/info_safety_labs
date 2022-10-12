@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:info_safety_lab1/controllers/user_controller.dart';
-import 'package:info_safety_lab1/model/user_model.dart';
+import 'package:info_safety_lab1/controllers/user_list_controller.dart';
 import 'package:info_safety_lab1/pages/change_password_page.dart';
 import 'package:info_safety_lab1/pages/user_list_page.dart';
 import 'package:info_safety_lab1/utils/context_x.dart';
@@ -8,14 +8,15 @@ import 'package:info_safety_lab1/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key, required this.user}) : super(key: key);
+  const HomePage({Key? key, required this.userListController, required this.userName}) : super(key: key);
 
-  final UserModel user;
+  final UserListController userListController;
+  final String userName;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-      value: UserController(user),
+      value: UserController(userListController, userName),
       child: const _Content(),
     );
   }
@@ -29,7 +30,7 @@ class _Content extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.userController.user;
-    final bool isAdmin = currentUser is AdminModel;
+    final bool isAdmin = currentUser.isAdmin;
     return Scaffold(
       appBar: AppBar(
         title: Text('user: ${isAdmin ? "ADMIN" : currentUser.name}'),

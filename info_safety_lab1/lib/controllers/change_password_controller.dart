@@ -17,8 +17,8 @@ class ChangePasswordController extends ChangeNotifier {
 
   int wrongAttempts = 0;
 
-  void setUsername(oldPassword) => this.oldPassword = oldPassword;
-  void setPassword(newPassword) => this.newPassword = newPassword;
+  void setOldPassword(oldPassword) => this.oldPassword = oldPassword;
+  void setNewPassword(newPassword) => this.newPassword = newPassword;
 
   void checkData({
     required void Function() onSuccess,

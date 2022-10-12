@@ -41,7 +41,7 @@ class _Content extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               TextField(
-                onChanged: (value) => context.changePasswordController.setUsername(value),
+                onChanged: (value) => context.changePasswordController.setOldPassword(value),
                 obscuringCharacter: '*',
                 obscureText: true,
                 decoration: const InputDecoration(
@@ -49,7 +49,7 @@ class _Content extends StatelessWidget {
                 ),
               ),
               TextField(
-                onChanged: (value) => context.changePasswordController.setPassword(value),
+                onChanged: (value) => context.changePasswordController.setNewPassword(value),
                 obscuringCharacter: '*',
                 obscureText: true,
                 decoration: const InputDecoration(
@@ -64,7 +64,10 @@ class _Content extends StatelessWidget {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                const Text('Password was successfully changed'),
+                                const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text('Password was successfully changed'),
+                                ),
                                 OutlinedButton(
                                   onPressed: () {
                                     Navigator.pop(context);
