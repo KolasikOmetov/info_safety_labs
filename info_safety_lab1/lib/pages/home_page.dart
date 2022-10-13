@@ -5,6 +5,7 @@ import 'package:info_safety_lab1/pages/change_password_page.dart';
 import 'package:info_safety_lab1/pages/user_list_page.dart';
 import 'package:info_safety_lab1/utils/context_x.dart';
 import 'package:info_safety_lab1/utils/utils.dart';
+import 'package:info_safety_lab1/widgets/app_scafold.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
@@ -31,10 +32,8 @@ class _Content extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUser = context.userController.user;
     final bool isAdmin = currentUser.isAdmin;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('user: ${isAdmin ? "ADMIN" : currentUser.name}'),
-      ),
+    return AppScaffold(
+      title: 'user: ${isAdmin ? "ADMIN" : currentUser.name}',
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -54,7 +53,7 @@ class _Content extends StatelessWidget {
                 child: const Text('Open Userlist'),
               ),
             OutlinedButton(
-              onPressed: () => exitProgram(),
+              onPressed: () => exitProgram(context),
               child: const Text('Exit'),
             ),
           ],

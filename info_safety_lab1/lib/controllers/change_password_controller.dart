@@ -21,6 +21,7 @@ class ChangePasswordController extends ChangeNotifier {
   void setNewPassword(newPassword) => this.newPassword = newPassword;
 
   void checkData({
+    required BuildContext context,
     required void Function() onSuccess,
     void Function()? onPasswordsEquals,
     void Function()? onPasswordsLimits,
@@ -31,7 +32,7 @@ class ChangePasswordController extends ChangeNotifier {
       wrongAttempts += 1;
       if (wrongAttempts == Constants.maxAttempts) {
         onAccessDenied?.call();
-        Future<void>.delayed(const Duration(seconds: 3), () => exitProgram());
+        Future<void>.delayed(const Duration(seconds: 3), () => exitProgram(context));
       } else {
         onPasswordWrong?.call();
       }

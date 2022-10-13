@@ -4,6 +4,7 @@ import 'package:info_safety_lab1/model/user_model.dart';
 import 'package:info_safety_lab1/pages/home_page.dart';
 import 'package:info_safety_lab1/utils/context_x.dart';
 import 'package:info_safety_lab1/utils/utils.dart';
+import 'package:info_safety_lab1/widgets/app_scafold.dart';
 import 'package:provider/provider.dart';
 
 class EntrancePage extends StatelessWidget {
@@ -25,10 +26,8 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
+    return AppScaffold(
+      title: 'Login',
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -51,6 +50,7 @@ class _Content extends StatelessWidget {
               ),
               OutlinedButton(
                 onPressed: () => context.entranceController.checkData(
+                  context: context,
                   onSuccess: (UserModel user) => moveTo(
                       context,
                       HomePage(

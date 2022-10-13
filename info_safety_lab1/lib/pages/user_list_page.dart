@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:info_safety_lab1/controllers/user_list_controller.dart';
 import 'package:info_safety_lab1/model/user_model.dart';
 import 'package:info_safety_lab1/utils/context_x.dart';
+import 'package:info_safety_lab1/widgets/app_scafold.dart';
 import 'package:info_safety_lab1/widgets/dialogs/add_user_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -10,12 +11,9 @@ class UserListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('User List'),
-      ),
-      body: const _Content(),
-      resizeToAvoidBottomInset: false,
+    return const AppScaffold(
+      title: 'User List',
+      body: _Content(),
     );
   }
 }
