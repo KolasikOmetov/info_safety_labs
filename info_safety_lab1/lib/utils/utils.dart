@@ -12,7 +12,7 @@ Future<void> moveTo(BuildContext context, Widget page) {
 }
 
 void exitProgram(BuildContext context) {
-  context.read<SystemService>().saveData();
+  context.read<SystemService>().saveDataBeforeExit();
   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
 }
 

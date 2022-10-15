@@ -61,21 +61,21 @@ class _Content extends StatelessWidget {
                     onSuccess: () => showDialog(
                           context: context,
                           builder: (context) => Dialog(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text('Password was successfully changed'),
-                                ),
-                                OutlinedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  const Text('Password was successfully changed'),
+                                  OutlinedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),

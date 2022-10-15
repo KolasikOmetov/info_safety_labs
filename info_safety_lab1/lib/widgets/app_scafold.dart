@@ -15,7 +15,10 @@ class AppScaffold extends StatelessWidget {
         actions: <Widget>[
           TextButton(
             onPressed: () => exitProgram(context),
-            child: const Text('Exit'),
+            child: Text(
+              'Exit',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
+            ),
           ),
         ],
       ),

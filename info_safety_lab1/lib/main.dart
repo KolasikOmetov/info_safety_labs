@@ -23,6 +23,7 @@ class App extends StatelessWidget {
         create: (_) => UserListController(systemService),
         child: MaterialApp(
           title: 'Lab 1',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
