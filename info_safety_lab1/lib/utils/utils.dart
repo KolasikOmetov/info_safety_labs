@@ -25,6 +25,7 @@ void showSnack(BuildContext context, String text) {
   );
 }
 
+/// Хеширование пароля с помощью алгоритма sha256
 String hashPassword(String password) {
   if (password.isEmpty) {
     return '';
