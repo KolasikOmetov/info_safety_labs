@@ -42,9 +42,9 @@ class UserListController extends ChangeNotifier {
 
   void setPassword(UserModel user, String password) {
     func(int index) {
-      var copyWith = user.password.copyWith(hash: password);
-      var copyWith2 = user.copyWith(password: copyWith);
-      users[index] = copyWith2;
+      final newPassword = user.password.copyWith(hash: password);
+      var updatedUser = user.copyWith(password: newPassword);
+      users[index] = updatedUser;
     }
 
     checkUserExists(user, func);

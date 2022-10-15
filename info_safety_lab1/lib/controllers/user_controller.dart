@@ -7,8 +7,11 @@ class UserController extends ChangeNotifier {
 
   final UserListController _userListController;
   final String userName;
+
+  /// Данные текущего пользователя
   UserModel get user => _userListController.users.firstWhere((user) => user.name == userName);
 
+  /// Валидация пароля с ограничениями
   bool isNotValidPasswordLimit(String password) => !(RegExp(r'[0-9]').hasMatch(password) &&
       RegExp(r'[.,!?:;]').hasMatch(password) &&
       RegExp(r'[+\-*\/^]').hasMatch(password));

@@ -1,10 +1,12 @@
-import 'dart:convert';
-
+/// Модель пароля
 class PasswordModel {
   const PasswordModel({this.hash = ''});
 
+  /// Хеш пароля пользователя
+  /// может быть пустым если у пользователя не установлен пароль
   final String hash;
 
+  /// Копия объекта с изменениями
   PasswordModel copyWith({
     String? hash,
   }) {
@@ -24,8 +26,4 @@ class PasswordModel {
       hash: map['hash'] ?? '',
     );
   }
-
-  String toJson() => json.encode(toMap());
-
-  factory PasswordModel.fromJson(String source) => PasswordModel.fromMap(json.decode(source));
 }

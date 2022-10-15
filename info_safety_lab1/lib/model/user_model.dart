@@ -1,5 +1,6 @@
 import 'package:info_safety_lab1/model/password_model.dart';
 
+/// Модель пользователя
 class UserModel {
   const UserModel({
     required this.name,
@@ -9,10 +10,19 @@ class UserModel {
     this.password = const PasswordModel(),
   });
 
+  /// Имя
   final String name;
+
+  /// Является ли пользователь администратором
   final bool isAdmin;
+
+  /// Заблокирован ли пользователь
   final bool isBlocked;
+
+  /// Есть ли ограничения на пароль
   final bool isPasswordChoosingLimited;
+
+  /// Модель пароля
   final PasswordModel password;
 
   Map<String, dynamic> toMap() {
@@ -35,6 +45,7 @@ class UserModel {
     );
   }
 
+  /// Копия объекта с изменениями
   UserModel copyWith({
     String? name,
     bool? isAdmin,

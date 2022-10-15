@@ -20,6 +20,7 @@ class ChangePasswordController extends ChangeNotifier {
   void setOldPassword(oldPassword) => this.oldPassword = oldPassword;
   void setNewPassword(newPassword) => this.newPassword = newPassword;
 
+  /// Проверка введенных данных пользователем
   void checkData({
     required BuildContext context,
     required void Function() onSuccess,
@@ -29,6 +30,8 @@ class ChangePasswordController extends ChangeNotifier {
     void Function()? onAccessDenied,
   }) {
     final oldPasswordHash = hashPassword(oldPassword);
+
+    /// Проверка пароля
     if (_user.password.hash != oldPasswordHash) {
       wrongAttempts += 1;
       if (wrongAttempts == Constants.maxAttempts) {
@@ -40,16 +43,19 @@ class ChangePasswordController extends ChangeNotifier {
       return;
     }
 
+    /// Проверка старого пароля
     if (oldPassword == newPassword) {
       onPasswordsEquals?.call();
       return;
     }
 
+    /// Проверка на ограничения на новый пароль
     if (_user.isPasswordChoosingLimited && _userController.isNotValidPasswordLimit(newPassword)) {
       onPasswordsLimits?.call();
       return;
     }
 
+    /// Закрепление пароля за пользователем
     _userListController.setPassword(_user, hashPassword(newPassword));
     onSuccess();
   }

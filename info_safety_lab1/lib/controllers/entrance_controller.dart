@@ -20,6 +20,7 @@ class EntranceController extends ChangeNotifier {
   void setUsername(userName) => this.userName = userName;
   void setPassword(password) => this.password = password;
 
+  /// Проверка введенных данных пользователем
   void checkData({
     required BuildContext context,
     required void Function(UserModel user) onSuccess,
@@ -29,17 +30,22 @@ class EntranceController extends ChangeNotifier {
     void Function()? onAccessDenied,
   }) {
     UserModel? user = users.firstWhereOrNull((user) => user.name == userName);
+
+    /// Проверка существования пользователя
     if (user == null) {
       onUserNotExists?.call();
       return;
     }
 
+    /// Проверка блокировки пользователя
     if (user.isBlocked) {
       onUserBlocked?.call();
       return;
     }
 
     final passwordHash = hashPassword(password);
+
+    /// Проверка пароля
     if (user.password.hash != passwordHash) {
       wrongAttempts++;
       if (wrongAttempts == Constants.maxAttempts) {
@@ -51,6 +57,7 @@ class EntranceController extends ChangeNotifier {
       return;
     }
 
+    /// Проверка успешно пройдена
     onSuccess(user);
   }
 }
