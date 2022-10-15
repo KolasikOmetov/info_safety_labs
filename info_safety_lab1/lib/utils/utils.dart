@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info_safety_lab1/services/system_service.dart';
@@ -20,4 +23,11 @@ void showSnack(BuildContext context, String text) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(content: Text(text)),
   );
+}
+
+String hashPassword(String password) {
+  if (password.isEmpty) {
+    return '';
+  }
+  return sha256.convert(utf8.encode(password)).toString();
 }

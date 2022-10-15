@@ -28,7 +28,8 @@ class ChangePasswordController extends ChangeNotifier {
     void Function()? onPasswordWrong,
     void Function()? onAccessDenied,
   }) {
-    if (_user.password.text != oldPassword) {
+    final oldPasswordHash = hashPassword(oldPassword);
+    if (_user.password.hash != oldPasswordHash) {
       wrongAttempts += 1;
       if (wrongAttempts == Constants.maxAttempts) {
         onAccessDenied?.call();
@@ -49,7 +50,7 @@ class ChangePasswordController extends ChangeNotifier {
       return;
     }
 
-    _userListController.setPassword(_user, newPassword);
+    _userListController.setPassword(_user, hashPassword(newPassword));
     onSuccess();
   }
 }

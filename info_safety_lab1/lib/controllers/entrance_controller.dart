@@ -39,7 +39,8 @@ class EntranceController extends ChangeNotifier {
       return;
     }
 
-    if (user.password.text != password) {
+    final passwordHash = hashPassword(password);
+    if (user.password.hash != passwordHash) {
       wrongAttempts++;
       if (wrongAttempts == Constants.maxAttempts) {
         onAccessDenied?.call();

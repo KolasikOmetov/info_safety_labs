@@ -1,27 +1,27 @@
 import 'dart:convert';
 
 class PasswordModel {
-  const PasswordModel({this.text = ''});
+  const PasswordModel({this.hash = ''});
 
-  final String text;
+  final String hash;
 
   PasswordModel copyWith({
-    String? text,
+    String? hash,
   }) {
     return PasswordModel(
-      text: text ?? this.text,
+      hash: hash ?? this.hash,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'text': text,
+      'hash': hash,
     };
   }
 
   factory PasswordModel.fromMap(Map<String, dynamic> map) {
     return PasswordModel(
-      text: map['text'] ?? '',
+      hash: map['hash'] ?? '',
     );
   }
 

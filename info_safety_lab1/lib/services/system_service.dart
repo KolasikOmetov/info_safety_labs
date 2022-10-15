@@ -75,7 +75,6 @@ class SystemService {
       final List<Map<String, dynamic>> rawUsers = List.from(map);
       return rawUsers.map<UserModel>((e) => UserModel.fromMap(e)).toList();
     }
-
     return [];
   }
 
