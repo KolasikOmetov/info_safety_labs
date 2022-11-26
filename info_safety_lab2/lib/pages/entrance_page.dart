@@ -30,34 +30,141 @@ class _Content extends StatelessWidget {
           child: Row(
             children: <Widget>[
               Expanded(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const <Widget>[
+                  Expanded(
+                    child: Text('''
+                  ПИбд-41 Омётов Николай,
+                  
+                  вариант 18-5 5.	
+                  Алгоритм ГОСТ 28147. Режим гаммирования.
+                  его описание
+                      '''),
+                  ),
+                  Expanded(
+                    child: _ChooseFilesSection(),
+                  ),
+                ],
+              )),
+              Expanded(
                 child: Column(
-                  children: [
+                  children: const [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {},
-                        child: const Text('Encrypt'),
-                      ),
+                      child: _EncryptSection(),
                     ),
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {},
-                        child: const Text('Decrypt'),
-                      ),
+                      child: _DecryptSection(),
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[
-                  Text('Content'),
-                ],
-              )),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DecryptSection extends StatelessWidget {
+  const _DecryptSection({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      onPressed: () {},
+      child: const Text('Decrypt'),
+    );
+  }
+}
+
+class _EncryptSection extends StatelessWidget {
+  const _EncryptSection({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Expanded(
+              child: TextField(
+                decoration: InputDecoration(hintText: 'Password'),
+              ),
+            ),
+            const SizedBox(
+              width: 4,
+            ),
+            const Text('or'),
+            const SizedBox(
+              width: 4,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  OutlinedButton(
+                    onPressed: () {},
+                    child: const Text('From file'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        OutlinedButton(
+          onPressed: () {},
+          child: const Text('Encrypt'),
+        ),
+      ],
+    );
+  }
+}
+
+class _ChooseFilesSection extends StatelessWidget {
+  const _ChooseFilesSection({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text('From'),
+        const SizedBox(
+          width: 4,
+        ),
+        Expanded(
+            child: Row(
+          children: [
+            OutlinedButton(
+              onPressed: () {},
+              child: const Text('Decrypt'),
+            ),
+            const Expanded(child: Text('From')),
+          ],
+        )),
+        const SizedBox(
+          width: 4,
+        ),
+        const Text('To'),
+        const SizedBox(
+          width: 4,
+        ),
+        Expanded(
+          child: Row(
+            children: [
+              OutlinedButton(
+                onPressed: () {},
+                child: const Text('From file'),
+              ),
+              const Expanded(child: Text('From')),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
