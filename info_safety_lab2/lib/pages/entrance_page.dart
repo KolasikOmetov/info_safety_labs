@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:info_safety_lab2/controllers/entrance_controller.dart';
+import 'package:info_safety_lab2/utils/context_x.dart';
+import 'package:info_safety_lab2/utils/utils.dart';
 import 'package:info_safety_lab2/widgets/app_scafold.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +11,7 @@ class EntrancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => EntranceController(),
+      create: (_) => EntranceController(context.read()),
       child: const _Content(),
     );
   }
@@ -90,35 +92,39 @@ class _EncryptSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: [
-            const Expanded(
-              child: TextField(
-                decoration: InputDecoration(hintText: 'Password'),
-              ),
-            ),
-            const SizedBox(
-              width: 4,
-            ),
-            const Text('or'),
-            const SizedBox(
-              width: 4,
-            ),
-            Expanded(
-              child: Column(
-                children: [
-                  OutlinedButton(
-                    onPressed: () {},
-                    child: const Text('From file'),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        Expanded(
+          child: TextField(
+            decoration: const InputDecoration(hintText: 'Password'),
+            onChanged: (String text) => context.entranceController.setPassword(text),
+          ),
         ),
-        OutlinedButton(
-          onPressed: () {},
-          child: const Text('Encrypt'),
+        const SizedBox(height: 16),
+        const Text('or'),
+        const SizedBox(height: 16),
+        Expanded(
+          child: Column(
+            children: [
+              OutlinedButton(
+                onPressed: () => context.entranceController.setPasswordPath(),
+                child: const Text('From file'),
+              ),
+              const SizedBox(height: 16),
+              Consumer<EntranceController>(
+                builder: (context, state, _) {
+                  return Text(state.pathPassword ?? 'File Path');
+                },
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: OutlinedButton(
+            onPressed: () => context.entranceController.encrypt(
+              onError: (String text) => showInfo(context, 'Error', text),
+              onSuccess: (String text) => showInfo(context, 'Success', text),
+            ),
+            child: const Text('Encrypt'),
+          ),
         ),
       ],
     );
@@ -137,30 +143,41 @@ class _ChooseFilesSection extends StatelessWidget {
           width: 4,
         ),
         Expanded(
-            child: Row(
-          children: [
-            OutlinedButton(
-              onPressed: () {},
-              child: const Text('Decrypt'),
-            ),
-            const Expanded(child: Text('From')),
-          ],
-        )),
-        const SizedBox(
-          width: 4,
+          child: Row(
+            children: [
+              OutlinedButton(
+                onPressed: () => context.entranceController.setPathFrom(),
+                child: const Text('Choose file'),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Consumer<EntranceController>(
+                  builder: (context, state, _) {
+                    return Text(state.pathFrom ?? 'File Path');
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
+        const SizedBox(width: 4),
         const Text('To'),
-        const SizedBox(
-          width: 4,
-        ),
+        const SizedBox(width: 4),
         Expanded(
           child: Row(
             children: [
               OutlinedButton(
-                onPressed: () {},
-                child: const Text('From file'),
+                onPressed: () => context.entranceController.setPathTo(),
+                child: const Text('Choose file path'),
               ),
-              const Expanded(child: Text('From')),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Consumer<EntranceController>(
+                  builder: (context, state, _) {
+                    return Text(state.pathTo ?? 'File Path');
+                  },
+                ),
+              ),
             ],
           ),
         ),

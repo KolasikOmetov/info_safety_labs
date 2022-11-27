@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final SystemService systemService = await SystemService.init();
+  final SystemService systemService = SystemService();
   runApp(App(systemService: systemService));
 }
 

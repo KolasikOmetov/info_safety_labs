@@ -29,3 +29,20 @@ String hashPassword(String password) {
   }
   return sha256.convert(utf8.encode(password)).toString();
 }
+
+void showInfo(BuildContext context, String title, String info) => showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.headline5,
+        ),
+        content: Text(info),
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          )
+        ],
+      ),
+    );
