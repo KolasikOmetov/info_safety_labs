@@ -11,7 +11,7 @@ class EntrancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => EntranceController(context.read()),
+      create: (_) => EntranceController(context.read(), context.read()),
       child: const _Content(),
     );
   }
@@ -49,17 +49,8 @@ class _Content extends StatelessWidget {
                   ),
                 ],
               )),
-              Expanded(
-                child: Column(
-                  children: const [
-                    Expanded(
-                      child: _EncryptSection(),
-                    ),
-                    Expanded(
-                      child: _DecryptSection(),
-                    ),
-                  ],
-                ),
+              const Expanded(
+                child: _ActionSection(),
               ),
             ],
           ),
@@ -69,22 +60,8 @@ class _Content extends StatelessWidget {
   }
 }
 
-class _DecryptSection extends StatelessWidget {
-  const _DecryptSection({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: () {},
-      child: const Text('Decrypt'),
-    );
-  }
-}
-
-class _EncryptSection extends StatelessWidget {
-  const _EncryptSection({
+class _ActionSection extends StatelessWidget {
+  const _ActionSection({
     Key? key,
   }) : super(key: key);
 
@@ -124,6 +101,15 @@ class _EncryptSection extends StatelessWidget {
               onSuccess: (String text) => showInfo(context, 'Success', text),
             ),
             child: const Text('Encrypt'),
+          ),
+        ),
+        Expanded(
+          child: OutlinedButton(
+            onPressed: () => context.entranceController.decrypt(
+              onError: (String text) => showInfo(context, 'Error', text),
+              onSuccess: (String text) => showInfo(context, 'Success', text),
+            ),
+            child: const Text('Decrypt'),
           ),
         ),
       ],
