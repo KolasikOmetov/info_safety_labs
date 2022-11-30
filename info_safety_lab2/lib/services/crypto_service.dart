@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:typed_data';
+
 
 // Gost28147
 class CryptoService {
-  final List<int> key = [300, 400, 500, 600];
+  final List<int> key = [300, 400, 500, 600, 700, 800, 900, 1100];
 
   static const kRoundAmount = 32;
   static const sBoxes = [
@@ -17,17 +19,17 @@ class CryptoService {
   ];
 
   List<int> encryptToBytes(String content, String password) {
-    List<int> byteContent = content.codeUnits;
+    Uint32List byteContent = Uint32List.fromList(content.codeUnits) ;
 
-    for (int byte = 0; byte < byteContent.length; byte += 2) {
+    for (int byteIndex = 0; byteIndex < byteContent.length; byteIndex += 2) {
+      int leftPartInit = byteContent[byteIndex];
+      int rightPartInit = byteContent[byteIndex];
       for (int round = 0; round < kRoundAmount; round++) {
-        final leftPartInit = byteContent.sublist(0, middle);
-        final rightPartInit = byteContent.sublist(middle);
+        int rightPartResult = rightPartInit & leftPartInit;
 
-        final rightPartByKey =
+        rightPartResult = ;
 
-            // Смена левой части на правую
-            byteContent = rightPartInit + leftPartInit;
+        rightPartInit = leftPartInit;
       }
     }
   }
