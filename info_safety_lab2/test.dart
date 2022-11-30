@@ -11,15 +11,31 @@ const sBoxes = [
   [1, 15, 13, 0, 5, 7, 10, 4, 9, 2, 3, 14, 6, 11, 8, 12],
 ];
 
-final Uint32List key = Uint32List.fromList([300, 400, 500, 600, 700, 800, 900, 1100]);
+final Uint32List key = Uint32List.fromList([32000, 400, 500, 600, 700, 800, 900, 1100]);
 
 void main() {
-  Uint32List byteContent = Uint32List.fromList('fignay_polnaya'.codeUnits);
+  // Uint32List byteContent = Uint32List.fromList('fignay_polnaya'.codeUnits);
+  Uint32List byteContent = Uint32List.fromList([32000, 42949672, 2048, 1023]);
   int leftPartInit = byteContent[0];
   print(leftPartInit.toRadixString(2));
   int rightPartInit = byteContent[1];
   print(rightPartInit.toRadixString(2));
 
-  int rightPartResult = rightPartInit & leftPartInit;
+  int rightPartResult = rightPartInit ^ key[0];
   print(rightPartResult.toRadixString(2));
+  List<int> sParts = List<int>.generate(32, (int index) {
+    final int bit = rightPartResult & 1;
+    rightPartResult = rightPartResult >> 1;
+    return bit;
+  }).reversed.toList();
+
+  List<int> sBoxesResults = List<int>.generate(sBoxes.length, (int index) {
+    final int sBoxIndex =
+        sParts[index * 4] * 8 + sParts[index * 4 + 1] * 4 + sParts[index * 4 + 2] * 2 + sParts[index * 4 + 3];
+    final int sBoxResult = sBoxes[index][sBoxIndex];
+    return sBoxResult;
+  });
+  print(sBoxesResults);
+
+  final int sBoxResult = sBoxesResults.;
 }
