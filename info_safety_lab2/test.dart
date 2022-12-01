@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 const sBoxes = [
@@ -14,20 +15,79 @@ const sBoxes = [
 final Uint32List key = Uint32List.fromList([32000, 400, 500, 600, 700, 800, 900, 1100]);
 
 void main() {
-  // Uint32List byteContent = Uint32List.fromList('fignay_polnaya'.codeUnits);
-  Uint32List byteContent = Uint32List.fromList([32000, 42949672, 2048, 1023]);
-  int leftPartInit = byteContent[0];
-  print(leftPartInit.toRadixString(2));
-  int rightPartInit = byteContent[1];
-  print(rightPartInit.toRadixString(2));
+  Uint32List byteContent = Uint32List.fromList('ку'.codeUnits);
+  List<int> bits = [];
+  for (var element in byteContent) {
+    bits.addAll(element.toBits(32));
+  }
 
-  int rightPartResult = rightPartInit ^ key[0];
-  print(rightPartResult.toRadixString(2));
-  List<int> sParts = List<int>.generate(32, (int index) {
-    final int bit = rightPartResult & 1;
-    rightPartResult = rightPartResult >> 1;
-    return bit;
-  }).reversed.toList();
+  print(bits.length);
+  print(bits.length % 64);
+
+  if (bits.length % 64 != 0) {
+    bits.addAll(0.toBits(32));
+  }
+
+  List<int> data = bits.sublist(0, 2);
+
+  print('dataBefore');
+  print(data);
+
+  for (int round = 0; round < 32; round++) {
+    data = calcRoundGOST(data, key[getKeyIndex(round)]);
+  }
+
+  print('dataAfter');
+  print(data);
+}
+
+int getKeyIndex(int round, [bool isEncript = false]) {
+  return isEncript
+      ? (round < 24)
+          ? round % 8
+          : 7 - (round % 8)
+      : (round < 8)
+          ? round % 8
+          : 7 - (round % 8);
+}
+
+extension IntToBits on int {
+  List<int> toBits(int radix) {
+    int number = this;
+    final List<int> bits = <int>[];
+    for (int i = 0; i < radix; i++) {
+      bits.add(number & 1);
+      number = number >> 1;
+    }
+    return bits.reversed.toList();
+  }
+
+  String get to2 => toBits(32).join();
+}
+
+extension BitsToInt on List<int> {
+  int toInt() {
+    int result = 0;
+    for (int i = 0; i < length; i++) {
+      result += (elementAt(i) * pow(2, length - 1 - i)).toInt();
+    }
+    return result;
+  }
+}
+
+List<int> calcRoundGOST(List<int> block, int key) {
+  int leftPartInit = block[0];
+  print('left');
+  print(leftPartInit.to2);
+  int rightPartInit = block[1];
+  print('right');
+  print(rightPartInit.to2);
+
+  int rightPartResult = (rightPartInit + key) % 32; // 25 - 32 round  key starts from 7
+  print('key sum');
+  print(rightPartResult.to2);
+  List<int> sParts = rightPartResult.toBits(32);
+  print(sParts.join());
 
   List<int> sBoxesResults = List<int>.generate(sBoxes.length, (int index) {
     final int sBoxIndex =
@@ -35,7 +95,32 @@ void main() {
     final int sBoxResult = sBoxes[index][sBoxIndex];
     return sBoxResult;
   });
+  print('sBoxesResults');
   print(sBoxesResults);
 
-  final int sBoxResult = sBoxesResults.;
+  List<int> sBoxResult = [];
+
+  for (int i = 0; i < sBoxesResults.length; i++) {
+    int element = sBoxesResults[i];
+    sBoxResult.addAll(element.toBits(4));
+  }
+  print('sBoxesResult');
+  print(sBoxResult.join());
+
+  final intSBoxResult = sBoxResult.toInt();
+  print(intSBoxResult);
+
+  final int offsetBy11Value = (intSBoxResult << 11) | (intSBoxResult >> 21);
+  print('Circle offset');
+  print(offsetBy11Value.to2);
+
+  final int bitSum = offsetBy11Value | leftPartInit;
+  print(leftPartInit.to2);
+  print('bitSum');
+  print(bitSum.to2);
+
+  final result = [bitSum, leftPartInit];
+  print('\nresult');
+  print('$result\n');
+  return result;
 }
