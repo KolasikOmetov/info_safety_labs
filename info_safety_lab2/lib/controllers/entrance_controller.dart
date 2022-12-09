@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:info_safety_lab2/services/crypto_service.dart';
 import 'package:info_safety_lab2/services/system_service.dart';
@@ -39,7 +40,7 @@ class EntranceController extends ChangeNotifier {
   }
 
   void setPathTo() async {
-    String? filepath = await SystemService.chooseSaveFilePath();
+    String? filepath = await SystemService.chooseFile();
     if (filepath != null) {
       pathTo = filepath;
       notifyListeners();
@@ -103,7 +104,6 @@ class EntranceController extends ChangeNotifier {
     }
 
     try {
-      final String oldContent = await systemService.readFile(pathFrom);
       String userPassword = '';
       if (password.isNotEmpty) {
         userPassword = password;
@@ -114,8 +114,10 @@ class EntranceController extends ChangeNotifier {
         }
         userPassword = await systemService.readFile(pathPassword);
       }
+      final Uint8List encrypted = await systemService.readFileAsBytes(pathFrom);
 
-      final String newContent = '$userPassword\n$oldContent';
+      final String newContent = cryptoService.decryptBytes(encrypted, userPassword);
+      debugPrintSynchronously('decrypted: $newContent');
       systemService.writeFile(pathTo, newContent.codeUnits);
     } catch (e) {
       onError(e.toString());

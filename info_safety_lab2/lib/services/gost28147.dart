@@ -23,11 +23,8 @@ final Uint32List key = Uint32List.fromList([
   0x10E50CE0,
 ]);
 
-const gamma = 0x713FA2D7B584295C;
-
-void main() {
-  Uint16List unicodes = Uint16List.fromList('hello, world!'.codeUnits);
-  print(unicodes);
+Uint8List encrypt(String text) {
+  Uint16List unicodes = Uint16List.fromList(text.codeUnits);
 
   final List<int> biteContent = [];
   for (int code in unicodes) {
@@ -45,52 +42,40 @@ void main() {
   }
 
   final cryptoData = <int>[];
-  final decryptedData = <int>[];
 
   for (final block in blocks) {
     final bytesBlock = block.bitsToBytes();
-    print(bytesBlock);
     final Uint8List cryptoResult = process(bytesBlock);
-    cryptoData.addAll(cryptoResult.toBits(8));
+    cryptoData.addAll(cryptoResult);
   }
 
+  return Uint8List.fromList(cryptoData);
+}
+
+String decrypt(List<int> bytes) {
+  final bits = Uint8List.fromList(bytes).toBits(8);
+  final decryptedData = <int>[];
+
   final List<List<int>> blocksEncrypted =
-      List<List<int>>.generate(cryptoData.length ~/ 64, (index) => cryptoData.sublist(index * 64, (index + 1) * 64));
+      List<List<int>>.generate(bits.length ~/ 64, (index) => bits.sublist(index * 64, (index + 1) * 64));
 
   for (final List<int> block in blocksEncrypted) {
     final bytesBlock = block.bitsToBytes();
-    print(bytesBlock);
     final Uint8List decryptoResult = process(bytesBlock, isEncrypte: false);
-    print('block: ${blocksEncrypted.join()}');
-    print('dlock: ${decryptoResult.toBits(8).join()}');
     decryptedData.addAll(decryptoResult.toBits(8));
   }
 
-  print('Encrypted');
-
-  final charsBlocksEncrypted = cryptoData.bitsToChars(unicodes.length);
-  print(charsBlocksEncrypted);
-  try {
-    print(String.fromCharCodes(charsBlocksEncrypted));
-  } catch (e) {
-    print(e);
-  }
-
   final rawCharsBlocksDecrypted = decryptedData.bitsToChars(decryptedData.length ~/ 16);
-  biteContent.clear();
+  final biteContent = <int>[];
   for (int code in rawCharsBlocksDecrypted) {
     final bites = code.toBits(16);
     biteContent.addAll(bites.sublist(8));
     biteContent.addAll(bites.sublist(0, 8));
   }
 
-  final charsBlocksDecrypted = biteContent.bitsToChars(unicodes.length);
+  final charsBlocksDecrypted = biteContent.bitsToChars(decryptedData.length ~/ 16);
 
-  try {
-    print(String.fromCharCodes(charsBlocksDecrypted));
-  } catch (e) {
-    print(e);
-  }
+  return String.fromCharCodes(charsBlocksDecrypted);
 }
 
 int getKeyIndex(int round, [bool isEncript = false]) {
@@ -161,10 +146,7 @@ Uint8List process(Uint8List block, {bool isEncrypte = true}) {
 
   for (int roundNumber = 0; roundNumber < 32; roundNumber++) {
     final keyIndex = (getKeyIndex(roundNumber, isEncrypte));
-    print('keyIndex: $keyIndex\n');
     final subKey = key[keyIndex];
-    print(block);
-    print(subKey);
     final fValue = f(leftPart, subKey);
     final roundResult = rightPart ^ fValue;
     if (roundNumber < 31) {
@@ -197,7 +179,6 @@ int sBoxConvert(int block) {
     final int sBlock = sBoxes[i][sIndex];
     sBlockResults[i % 2 == 0 ? i + 1 : i - 1] = sBlock;
   }
-  print(sBlockResults);
 
   result = sBlockResults.toBits(4).toInt();
   return result;
