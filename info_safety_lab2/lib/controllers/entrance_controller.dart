@@ -65,7 +65,6 @@ class EntranceController extends ChangeNotifier {
     }
 
     try {
-      final String oldContent = await systemService.readFile(pathFrom);
       String userPassword = '';
       if (password.isNotEmpty) {
         userPassword = password;
@@ -77,8 +76,11 @@ class EntranceController extends ChangeNotifier {
         userPassword = await systemService.readFile(pathPassword);
       }
 
-      final List<int> ecrypted = cryptoService.encryptToBytes(oldContent, userPassword);
-      systemService.writeFile(pathTo, ecrypted);
+      final List<int> oldContent = await systemService.readFileAsBytes(pathFrom);
+      final List<int> encrypted = cryptoService.gammingEncrypt(Uint8List.fromList(userPassword.codeUnits), oldContent);
+      debugPrintSynchronously('encryptedUnicodes: $encrypted');
+
+      systemService.writeFile(pathTo, encrypted);
     } catch (e) {
       onError(e.toString());
       return;
@@ -116,7 +118,7 @@ class EntranceController extends ChangeNotifier {
       }
       final Uint8List encrypted = await systemService.readFileAsBytes(pathFrom);
 
-      final String newContent = cryptoService.decryptBytes(encrypted, userPassword);
+      final String newContent = cryptoService.gammingDecrypt(Uint8List.fromList(userPassword.codeUnits), encrypted);
       debugPrintSynchronously('decrypted: $newContent');
       systemService.writeFile(pathTo, newContent.codeUnits);
     } catch (e) {

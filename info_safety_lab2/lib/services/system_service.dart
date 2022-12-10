@@ -14,5 +14,6 @@ class SystemService {
   Future<void> writeFile(String path, List<int> bytes) => File(path).writeAsBytes(bytes);
 
   Future<String> readFile(String path) => File(path).readAsString();
+
   Future<Uint8List> readFileAsBytes(String path) => File(path).readAsBytes();
 }
