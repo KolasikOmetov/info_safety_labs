@@ -23,7 +23,8 @@ final Uint32List key = Uint32List.fromList([
   0x10E50CE0,
 ]);
 
-const gamma = 0x713FA2D7B584295C;
+final Uint8List initialGamma = Uint8List.fromList([0x21, 0x04, 0x3B, 0x04, 0x30, 0x04, 0x32, 0x04]);
+// final Uint8List initialGamma = Uint8List.fromList([0x71, 0x3F, 0xA2, 0xD7, 0xB5,0x84,0x29,0x5C]);
 
 void main() {
   Uint16List unicodes = Uint16List.fromList('hello, world!'.codeUnits);
@@ -35,40 +36,51 @@ void main() {
     biteContent.addAll(bites.sublist(8));
     biteContent.addAll(bites.sublist(0, 8));
   }
-
   final blocks =
       List<List<int>>.generate(biteContent.length ~/ 64, (index) => biteContent.sublist(index * 64, (index + 1) * 64));
-
   int remain = biteContent.length % 64;
   if (remain != 0) {
-    blocks.add([...biteContent.sublist(biteContent.length ~/ 64 * 64), ...List<int>.generate(64 - remain, (_) => 0)]);
+    blocks.add(biteContent.sublist(biteContent.length ~/ 64 * 64));
   }
+
+  var gamma = initialGamma;
 
   final cryptoData = <int>[];
   final decryptedData = <int>[];
 
-  for (final block in blocks) {
-    final bytesBlock = block.bitsToBytes();
-    print(bytesBlock);
-    final Uint8List cryptoResult = process(bytesBlock);
-    cryptoData.addAll(cryptoResult.toBits(8));
+  for (final List<int> block in blocks) {
+    gamma = gammaStep(gamma);
+
+    if (block.length < 64) {
+      gamma = gamma.toBits(8).sublist(0, block.length).bitsToBytes(length: block.length ~/ 8);
+    }
+    final int decryptedBlock = gamma.toInt() ^ block.toInt();
+
+    List<int> decryptedBits = decryptedBlock.toBits(64);
+
+    decryptedData.addAll(decryptedBits);
+
+    gamma = decryptedBits.bitsToBytes();
   }
 
   final List<List<int>> blocksEncrypted =
       List<List<int>>.generate(cryptoData.length ~/ 64, (index) => cryptoData.sublist(index * 64, (index + 1) * 64));
 
   for (final List<int> block in blocksEncrypted) {
-    final bytesBlock = block.bitsToBytes();
-    print(bytesBlock);
-    final Uint8List decryptoResult = process(bytesBlock, isEncrypte: false);
-    print('block: ${blocksEncrypted.join()}');
-    print('dlock: ${decryptoResult.toBits(8).join()}');
-    decryptedData.addAll(decryptoResult.toBits(8));
+    gamma = gammaStep(gamma);
+    if (block.length < 64) {
+      gamma = gamma.toBits(8).sublist(0, block.length).bitsToBytes(length: block.length ~/ 8);
+    }
+    final int encryptedBlock = gamma.toInt() ^ block.toInt();
+
+    List<int> encryptedBits = encryptedBlock.toBits(64);
+
+    cryptoData.addAll(encryptedBits);
+
+    gamma = encryptedBits.bitsToBytes();
   }
 
-  print('Encrypted');
-
-  final charsBlocksEncrypted = cryptoData.bitsToChars(unicodes.length);
+  final charsBlocksEncrypted = cryptoData.bitsToChars(cryptoData.length ~/ 16);
   print(charsBlocksEncrypted);
   try {
     print(String.fromCharCodes(charsBlocksEncrypted));
@@ -77,14 +89,14 @@ void main() {
   }
 
   final rawCharsBlocksDecrypted = decryptedData.bitsToChars(decryptedData.length ~/ 16);
-  biteContent.clear();
+  final bitContent = <int>[];
   for (int code in rawCharsBlocksDecrypted) {
     final bites = code.toBits(16);
-    biteContent.addAll(bites.sublist(8));
-    biteContent.addAll(bites.sublist(0, 8));
+    bitContent.addAll(bites.sublist(8));
+    bitContent.addAll(bites.sublist(0, 8));
   }
 
-  final charsBlocksDecrypted = biteContent.bitsToChars(unicodes.length);
+  final charsBlocksDecrypted = bitContent.bitsToChars(bitContent.length ~/ 16);
 
   try {
     print(String.fromCharCodes(charsBlocksDecrypted));
@@ -112,7 +124,7 @@ extension IntToBits on int {
     return bits.reversed.toList();
   }
 
-  String get to2 => toBits(32).join();
+  String to2({int radix = 32}) => toBits(radix).join();
 }
 
 extension BitsToInt on List<int> {
@@ -124,8 +136,8 @@ extension BitsToInt on List<int> {
     return result;
   }
 
-  Uint8List bitsToBytes() =>
-      Uint8List.fromList(List<int>.generate(8, (index) => sublist(index * 8, (index + 1) * 8).toInt()));
+  Uint8List bitsToBytes({int length = 8}) =>
+      Uint8List.fromList(List<int>.generate(length, (index) => sublist(index * 8, (index + 1) * 8).toInt()));
 
   List<int> bitsToChars(int length) =>
       List<int>.generate(length, (index) => sublist(index * 16, (index + 1) * 16).toInt());
@@ -161,9 +173,8 @@ Uint8List process(Uint8List block, {bool isEncrypte = true}) {
 
   for (int roundNumber = 0; roundNumber < 32; roundNumber++) {
     final keyIndex = (getKeyIndex(roundNumber, isEncrypte));
-    print('keyIndex: $keyIndex\n');
+    print('\nkeyIndex: $keyIndex');
     final subKey = key[keyIndex];
-    print(block);
     print(subKey);
     final fValue = f(leftPart, subKey);
     final roundResult = rightPart ^ fValue;
@@ -201,4 +212,29 @@ int sBoxConvert(int block) {
 
   result = sBlockResults.toBits(4).toInt();
   return result;
+}
+
+Uint8List gammaStep(Uint8List initialGamma) {
+  final Uint8List cryptoResult = process(initialGamma);
+  print(cryptoResult);
+
+  final cryptoBits = cryptoResult.toBits(8);
+  final middle = cryptoBits.length ~/ 2;
+  var leftPart = cryptoBits.sublist(0, middle).toInt();
+  var rightPart = cryptoBits.sublist(middle).toInt();
+
+  leftPart = (leftPart + 0x1010104) % pow(2, 32).toInt();
+  if (rightPart != pow(2, 32) - 1) {
+    rightPart = (rightPart + 0x1010101 - 1) % (pow(2, 32).toInt() - 1) + 1;
+  }
+
+  print(leftPart.to2());
+  print(rightPart.to2());
+
+  final preGamma = leftPart * pow(2, 32).toInt() + rightPart;
+  print(preGamma);
+
+  final gamma = process(preGamma.toBits(64).bitsToBytes());
+
+  return gamma;
 }
