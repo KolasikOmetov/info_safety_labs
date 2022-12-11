@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // сервис для общения с платформой
   final SystemService systemService = SystemService();
   runApp(App(systemService: systemService));
 }
@@ -18,6 +19,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
+      // сервис для криптографии
       create: (context) => CryptoService(),
       child: Provider<SystemService>(
         create: (context) => systemService,

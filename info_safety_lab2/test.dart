@@ -219,21 +219,21 @@ List<int> gamming(
 
   for (final List<int> block in blocks) {
     gamma = gammaStep(initialGamma);
-    print('block: ${block.join()}');
-    print('gamma: $gamma');
+    // print('block: ${block.join()}');
+    // print('gamma: $gamma');
     if (block.length < 64) {
       gamma = gamma.toBits(8).sublist(0, block.length).bitsToBytes(length: block.length ~/ 8);
     }
     final int encryptedBlock = gamma.fromListToInt() ^ block.toInt();
     // print('gamma: ${gamma.toInt()}');
     // print('block: ${block.toInt()}');
-    print('encryptedBlock: $encryptedBlock');
+    // print('encryptedBlock: $encryptedBlock');
 
     List<int> encryptedBits = encryptedBlock.toBits(block.length);
 
     data.addAll(encryptedBits);
   }
-  print(data.join());
+// print(data.join());
 
   return data;
 }

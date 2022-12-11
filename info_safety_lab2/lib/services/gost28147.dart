@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+// список S-boxов для замены по индексу
 const sBoxes = [
   [4, 10, 9, 2, 13, 8, 0, 14, 6, 11, 1, 12, 7, 15, 5, 3],
   [14, 11, 4, 12, 6, 13, 15, 10, 2, 3, 8, 1, 0, 7, 5, 9],
@@ -12,6 +13,7 @@ const sBoxes = [
   [1, 15, 13, 0, 5, 7, 10, 4, 9, 2, 3, 14, 6, 11, 8, 12],
 ];
 
+// ключ для шифрования
 final Uint32List key = Uint32List.fromList([
   0xF904C1E2,
   0xDE7C1DE4,
@@ -23,68 +25,19 @@ final Uint32List key = Uint32List.fromList([
   0x10E50CE0,
 ]);
 
-Uint8List encrypt(String text) {
-  Uint16List unicodes = Uint16List.fromList(text.codeUnits);
-  final List<int> biteContent = [];
-  for (int code in unicodes) {
-    final bites = code.toBits(16);
-    biteContent.addAll(bites.sublist(8));
-    biteContent.addAll(bites.sublist(0, 8));
-  }
-
-  final blocks =
-      List<List<int>>.generate(biteContent.length ~/ 64, (index) => biteContent.sublist(index * 64, (index + 1) * 64));
-
-  int remain = biteContent.length % 64;
-  if (remain != 0) {
-    blocks.add([...biteContent.sublist(biteContent.length ~/ 64 * 64), ...List<int>.generate(64 - remain, (_) => 0)]);
-  }
-
-  final cryptoData = <int>[];
-
-  for (final block in blocks) {
-    final bytesBlock = block.bitsToBytes();
-    final Uint8List cryptoResult = process(bytesBlock);
-    cryptoData.addAll(cryptoResult);
-  }
-
-  return Uint8List.fromList(cryptoData);
-}
-
-String decrypt(List<int> bytes) {
-  final bits = Uint8List.fromList(bytes).toBits(8);
-  final decryptedData = <int>[];
-
-  final List<List<int>> blocksEncrypted =
-      List<List<int>>.generate(bits.length ~/ 64, (index) => bits.sublist(index * 64, (index + 1) * 64));
-
-  for (final List<int> block in blocksEncrypted) {
-    final bytesBlock = block.bitsToBytes();
-    final Uint8List decryptoResult = process(bytesBlock, isEncrypte: false);
-    decryptedData.addAll(decryptoResult.toBits(8));
-  }
-
-  final rawCharsBlocksDecrypted = decryptedData.bitsToChars();
-  final biteContent = <int>[];
-  for (int code in rawCharsBlocksDecrypted) {
-    final bites = code.toBits(16);
-    biteContent.addAll(bites.sublist(8));
-    biteContent.addAll(bites.sublist(0, 8));
-  }
-
-  final charsBlocksDecrypted = biteContent.bitsToChars();
-
-  return String.fromCharCodes(charsBlocksDecrypted);
-}
-
+// алгоритм ГОСТ 28147. Режим гаммирования
+// На входе гамма и данные для шифрования
+// На выходе массив битов зашифрованных данных
 List<int> gammingEn(
   Uint8List initialGamma,
   List<int> content,
 ) {
+  // приведение гаммы к 64 битам
   initialGamma = initialGamma.length < 8
       ? Uint8List.fromList([...initialGamma, ...Iterable.generate(8 - (initialGamma.length % 8), (_) => 0)])
       : initialGamma.sublist(0, 8);
 
+  // смена битов местами
   final List<int> biteContent = [];
   for (int code in content) {
     final bites = code.toBits(16);
@@ -94,63 +47,84 @@ List<int> gammingEn(
 
   final data = <int>[];
 
+  // разбиение данных на блоки по 64 бит
   final blocks =
       List<List<int>>.generate(biteContent.length ~/ 64, (index) => biteContent.sublist(index * 64, (index + 1) * 64));
+  // вычисление остатка данных и добавление их отдельным блоком
   int remain = biteContent.length % 64;
   if (remain != 0) {
     blocks.add(biteContent.sublist(biteContent.length ~/ 64 * 64));
   }
-  Uint8List gamma;
 
+  // процесс поблочного кодирования
+  Uint8List gamma;
   for (final List<int> block in blocks) {
+    // шифрование гаммы
     gamma = gammaStep(initialGamma);
+    // подгон размера гаммы под остаток
     if (block.length < 64) {
       gamma = gamma.toBits(8).sublist(0, block.length).bitsToBytes(length: block.length ~/ 8);
     }
+    // гамма и блок данных по порязрядно складываются по модулю 2
     final int encryptedBlock = gamma.fromListToInt() ^ block.toInt();
 
+    // перевод в битовое представление
     List<int> encryptedBits = encryptedBlock.toBits(block.length);
-
+    // сбор данных в единый массив
     data.addAll(encryptedBits);
   }
 
   return data;
 }
 
+// алгоритм ГОСТ 28147. Режим гаммирования
+// На входе гамма и данные для расшифрования
+// На выходе массив битов расшифрованных данных
 List<int> gammingDe(
   Uint8List initialGamma,
   List<int> content,
 ) {
+  // приведение гаммы к 64 битам
   initialGamma = initialGamma.length < 8
       ? Uint8List.fromList([...initialGamma, ...Iterable.generate(8 - (initialGamma.length % 8), (_) => 0)])
       : initialGamma.sublist(0, 8);
 
+  // смена битов местами
   final List<int> biteContent = [];
   for (int code in content) {
     biteContent.addAll(code.toBits(16));
   }
   final data = <int>[];
 
+  // разбиение данных на блоки по 64 бит
   final blocks =
       List<List<int>>.generate(biteContent.length ~/ 64, (index) => biteContent.sublist(index * 64, (index + 1) * 64));
+  // вычисление остатка данных и добавление их отдельным блоком
   int remain = biteContent.length % 64;
   if (remain != 0) {
     blocks.add(biteContent.sublist(biteContent.length ~/ 64 * 64));
   }
-  Uint8List gamma;
 
+  // процесс поблочного кодирования
+  Uint8List gamma;
   for (final List<int> block in blocks) {
+    // шифрование гаммы
     gamma = gammaStep(initialGamma);
+    // подгон размера гаммы под остаток
     if (block.length < 64) {
       gamma = gamma.toBits(8).sublist(0, block.length).bitsToBytes(length: block.length ~/ 8);
     }
+    // гамма и блок данных по порязрядно складываются по модулю 2
     final int encryptedBlock = gamma.fromListToInt() ^ block.toInt();
 
+    // перевод в битовое представление
     List<int> encryptedBits = encryptedBlock.toBits(block.length);
 
+    // сбор данных в единый массив
     data.addAll(encryptedBits);
   }
 
+  // обработка перестановки байтов
   final rawCharsBlocksDecrypted = data.bitsToChars();
   final bitContent = <int>[];
   for (int code in rawCharsBlocksDecrypted) {
@@ -159,29 +133,38 @@ List<int> gammingDe(
     bitContent.addAll(bites.sublist(0, 8));
   }
 
+  // обработка битов в байты для перевода в текст
   return bitContent.bitsToChars();
 }
 
+// шаг обработки гаммы
 Uint8List gammaStep(Uint8List initialGamma) {
+  // кодирование гаммы основными шагами
   final Uint8List cryptoResult = process(initialGamma);
 
+  // разделение блока на части
   final cryptoBits = cryptoResult.toBits(8);
   final middle = cryptoBits.length ~/ 2;
   var leftPart = cryptoBits.sublist(0, middle).toInt();
   var rightPart = cryptoBits.sublist(middle).toInt();
 
+  // сложение по модулю 2^32 с постоянным значением 1010101(16).
   leftPart = (leftPart + 0x1010101) % pow(2, 32).toInt();
   if (rightPart != pow(2, 32) - 1) {
+    // сложение по модулю 2^32-1 с постоянным значением 1010104(16)
     rightPart = ((rightPart + 0x1010104 - 1) % (pow(2, 32).toInt() - 1)) + 1;
   }
 
+  // объединение частей
   final preGamma = leftPart * pow(2, 32).toInt() + rightPart;
 
+  // кодирование гаммы основными шагами
   final gamma = process(preGamma.toBits(64).bitsToBytes());
 
   return gamma;
 }
 
+// получение индекса части ключа по определённому раунду
 int getKeyIndex(int round, [bool isEncript = false]) {
   if (isEncript) {
     return round < 24 ? (round % 8) : 7 - (round % 8);
@@ -191,6 +174,7 @@ int getKeyIndex(int round, [bool isEncript = false]) {
 }
 
 extension IntToBits on int {
+  // перевод целочисленного значения в битовое представление
   List<int> toBits(int radix) {
     int number = this;
     final List<int> bits = <int>[];
@@ -201,10 +185,12 @@ extension IntToBits on int {
     return bits.reversed.toList();
   }
 
+  // отображение битов в строковом представлении
   String to2([int radix = 32]) => toBits(radix).join();
 }
 
 extension BitsToInt on List<int> {
+  // перевод битов в целое число
   int toInt() {
     int result = 0;
     for (int i = 0; i < length; i++) {
@@ -213,14 +199,17 @@ extension BitsToInt on List<int> {
     return result;
   }
 
+  // биты в байты
   Uint8List bitsToBytes({int length = 8}) =>
       Uint8List.fromList(List<int>.generate(length, (index) => sublist(index * 8, (index + 1) * 8).toInt()));
 
+  // биты в байтовое представление символов
   List<int> bitsToChars([int radix = 16]) =>
       List<int>.generate(length ~/ radix, (index) => sublist(index * radix, (index + 1) * radix).toInt());
 }
 
 extension BytesToInt on Uint8List {
+  // байты в целое число
   int fromListToInt() {
     List<int> result = [];
     for (int i = 0; i < length; i++) {
@@ -229,6 +218,7 @@ extension BytesToInt on Uint8List {
     return result.toInt();
   }
 
+  // байты в биты
   List<int> toBits(int radix) {
     final List<int> allBits = <int>[];
     for (int i = 0; i < length; i++) {
@@ -244,15 +234,24 @@ extension BytesToInt on Uint8List {
   }
 }
 
+// основной шаг алгоритма
 Uint8List process(Uint8List block, {bool isEncrypte = true}) {
+  // разбиение на 2 части
   var leftPart = block.sublist(0, 4).fromListToInt();
   var rightPart = block.sublist(4).fromListToInt();
 
+  // проведение раундов
   for (int roundNumber = 0; roundNumber < 32; roundNumber++) {
+    // получение индекса ключа для раунда
     final keyIndex = (getKeyIndex(roundNumber, isEncrypte));
+    // получение подключа
     final subKey = key[keyIndex];
+    // расчёт f функции алгоритма
     final fValue = f(leftPart, subKey);
+    // правая часть и результат f функции порязрядно складываются по модулю 2
     final roundResult = rightPart ^ fValue;
+
+    // смена частей местами
     if (roundNumber < 31) {
       rightPart = leftPart;
       leftPart = roundResult;
@@ -261,13 +260,17 @@ Uint8List process(Uint8List block, {bool isEncrypte = true}) {
     }
   }
 
+  // вывод готового блока данных
   return [...leftPart.toBits(32), ...rightPart.toBits(32)].bitsToBytes();
 }
 
 int f(int leftPart, int subkey) {
+  // сложение левой части с подключом по модулю 2(32)
   int block = (leftPart + subkey) % pow(2, 32).toInt();
+  // применение S-boxов
   block = sBoxConvert(block);
 
+  // циклический сдвиг на 11 битов
   final blockBits = block.toBits(32);
   block = [...blockBits.sublist(11), ...blockBits.sublist(0, 11)].toInt();
   return block;
@@ -278,6 +281,7 @@ int sBoxConvert(int block) {
   List<int> bits = block.toBits(32);
   Uint8List sBlockResults = Uint8List(8);
 
+  // разделение на байты и определение значения замены через S-boxы
   for (var i = 0; i < 8; i++) {
     final int sIndex = (i % 2 == 0 ? bits.sublist((i + 1) * 4, (i + 2) * 4) : bits.sublist((i - 1) * 4, i * 4)).toInt();
     final int sBlock = sBoxes[i][sIndex];

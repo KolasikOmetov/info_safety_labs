@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:info_safety_lab2/services/crypto_service.dart';
 import 'package:info_safety_lab2/services/system_service.dart';
 
@@ -13,16 +12,10 @@ class EntranceController extends ChangeNotifier {
   String? pathFrom;
   String? pathTo;
 
+  // установка пароля
   void setPassword(password) => this.password = password;
 
-  /// Проверка введенных данных пользователем
-  void checkData({
-    required BuildContext context,
-    required void Function() onSuccess,
-  }) {
-    onSuccess();
-  }
-
+  // установка пути откуда будем брать данные
   void setPathFrom() async {
     String? filepath = await SystemService.chooseFile();
     if (filepath != null) {
@@ -31,6 +24,7 @@ class EntranceController extends ChangeNotifier {
     }
   }
 
+  // установка пути откуда будем пароль
   void setPasswordPath() async {
     String? filepath = await SystemService.chooseFile();
     if (filepath != null) {
@@ -39,6 +33,7 @@ class EntranceController extends ChangeNotifier {
     }
   }
 
+  // установка пути куда будем сохранять данные
   void setPathTo() async {
     String? filepath = await SystemService.chooseFile();
     if (filepath != null) {
@@ -47,6 +42,7 @@ class EntranceController extends ChangeNotifier {
     }
   }
 
+  // процесс шифрования
   void encrypt({
     required void Function(String text) onError,
     required void Function(String text) onSuccess,
@@ -55,6 +51,7 @@ class EntranceController extends ChangeNotifier {
     final pathFrom = this.pathFrom;
     final pathPassword = this.pathPassword;
 
+    // проверки на пустоту
     if (pathTo == null) {
       onError('Path "To" must be set');
       return;
@@ -73,13 +70,17 @@ class EntranceController extends ChangeNotifier {
           onError('Password must be set');
           return;
         }
+        // если пароль не введён то устанавливаем его из файла
         userPassword = await systemService.readFile(pathPassword);
       }
 
+      // загрузка контента из файла в виде байтов
       final List<int> oldContent = await systemService.readFileAsBytes(pathFrom);
+      // шифрование контента алгоритмом ГОСТ-28147 в режиме гаммирования
       final List<int> encrypted = cryptoService.gammingEncrypt(Uint8List.fromList(userPassword.codeUnits), oldContent);
       debugPrintSynchronously('encryptedUnicodes: $encrypted');
 
+      // запись в файл зашифрованных байтов
       systemService.writeFile(pathTo, encrypted);
     } catch (e) {
       onError(e.toString());
@@ -114,12 +115,16 @@ class EntranceController extends ChangeNotifier {
           onError('Password must be set');
           return;
         }
+        // если пароль не введён то устанавливаем его из файла
         userPassword = await systemService.readFile(pathPassword);
       }
+      // загрузка контента из файла в виде байтов
       final Uint8List encrypted = await systemService.readFileAsBytes(pathFrom);
 
+      // расшифровка контента алгоритмом ГОСТ-28147 в режиме гаммирования происходит по тому же алгоритму, что и шифрование
       final String newContent = cryptoService.gammingDecrypt(Uint8List.fromList(userPassword.codeUnits), encrypted);
       debugPrintSynchronously('decrypted: $newContent');
+      // запись в файл расшифрованных байтов
       systemService.writeFile(pathTo, newContent.codeUnits);
     } catch (e) {
       onError(e.toString());
