@@ -41,7 +41,7 @@ class _Content extends StatelessWidget {
                   
                   вариант 18-5 5.	
                   Алгоритм ГОСТ 28147. Режим гаммирования.
-                  его описание
+                  Режим гаммирования принимает на вход данные любого размера, а также дополнительный 64-битовый параметр — синхропосылку. В ходе работы синхропосылка преобразуется в цикле «32-З», результат делится на две части. Первая часть складывается по модулю 232 с постоянным значением 101010116. Если вторая часть равна 232-1, то её значение не меняется, иначе она складывается по модулю 232-1 с постоянным значением 101010416. Полученное объединением обеих преобразованных частей значение, называемое гаммой шифра, поступает в цикл «32-З», его результат порязрядно складывается по модулю 2 с 64-разрядным блоком входных данных. Если последний меньше 64-х разрядов, то лишние разряды полученного значения отбрасываются. Полученное значение подаётся на выход. Если ещё имеются входящие данные, то действие повторяется: составленный из 32-разрядных частей блок преобразуется по частям и так далее.
                       '''),
                   ),
                   Expanded(
@@ -95,21 +95,27 @@ class _ActionSection extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: OutlinedButton(
-            onPressed: () => context.entranceController.encrypt(
-              onError: (String text) => showInfo(context, 'Error', text),
-              onSuccess: (String text) => showInfo(context, 'Success', text),
+          child: SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => context.entranceController.encrypt(
+                onError: (String text) => showInfo(context, 'Error', text),
+                onSuccess: (String text) => showInfo(context, 'Success', text),
+              ),
+              child: const Text('Encrypt'),
             ),
-            child: const Text('Encrypt'),
           ),
         ),
         Expanded(
-          child: OutlinedButton(
-            onPressed: () => context.entranceController.decrypt(
-              onError: (String text) => showInfo(context, 'Error', text),
-              onSuccess: (String text) => showInfo(context, 'Success', text),
+          child: SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => context.entranceController.decrypt(
+                onError: (String text) => showInfo(context, 'Error', text),
+                onSuccess: (String text) => showInfo(context, 'Success', text),
+              ),
+              child: const Text('Decrypt'),
             ),
-            child: const Text('Decrypt'),
           ),
         ),
       ],

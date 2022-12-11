@@ -1,8 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
-
 const sBoxes = [
   [4, 10, 9, 2, 13, 8, 0, 14, 6, 11, 1, 12, 7, 15, 5, 3],
   [14, 11, 4, 12, 6, 13, 15, 10, 2, 3, 8, 1, 0, 7, 5, 9],
@@ -87,8 +85,6 @@ List<int> gammingEn(
       ? Uint8List.fromList([...initialGamma, ...Iterable.generate(8 - (initialGamma.length % 8), (_) => 0)])
       : initialGamma.sublist(0, 8);
 
-  debugPrintSynchronously('unicodes: $content');
-
   final List<int> biteContent = [];
   for (int code in content) {
     final bites = code.toBits(16);
@@ -108,21 +104,15 @@ List<int> gammingEn(
 
   for (final List<int> block in blocks) {
     gamma = gammaStep(initialGamma);
-    print('block: ${block.join()}');
-    print('gamma: $gamma');
     if (block.length < 64) {
       gamma = gamma.toBits(8).sublist(0, block.length).bitsToBytes(length: block.length ~/ 8);
     }
     final int encryptedBlock = gamma.fromListToInt() ^ block.toInt();
-    // print('gamma: ${gamma.toInt()}');
-    // print('block: ${block.toInt()}');
-    print('encryptedBlock: $encryptedBlock');
 
     List<int> encryptedBits = encryptedBlock.toBits(block.length);
 
     data.addAll(encryptedBits);
   }
-  print(data.join());
 
   return data;
 }
@@ -260,9 +250,7 @@ Uint8List process(Uint8List block, {bool isEncrypte = true}) {
 
   for (int roundNumber = 0; roundNumber < 32; roundNumber++) {
     final keyIndex = (getKeyIndex(roundNumber, isEncrypte));
-    // print('\nkeyIndex: $keyIndex');
     final subKey = key[keyIndex];
-    // print(subKey);
     final fValue = f(leftPart, subKey);
     final roundResult = rightPart ^ fValue;
     if (roundNumber < 31) {
@@ -295,7 +283,6 @@ int sBoxConvert(int block) {
     final int sBlock = sBoxes[i][sIndex];
     sBlockResults[i % 2 == 0 ? i + 1 : i - 1] = sBlock;
   }
-  // print(sBlockResults);
 
   result = sBlockResults.toBits(4).toInt();
   return result;
