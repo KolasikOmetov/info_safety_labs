@@ -78,7 +78,6 @@ class EntranceController extends ChangeNotifier {
       final List<int> oldContent = await systemService.readFileAsBytes(pathFrom);
       // шифрование контента алгоритмом ГОСТ-28147 в режиме гаммирования
       final List<int> encrypted = cryptoService.gammingEncrypt(Uint8List.fromList(userPassword.codeUnits), oldContent);
-      debugPrintSynchronously('encryptedUnicodes: $encrypted');
 
       // запись в файл зашифрованных байтов
       systemService.writeFile(pathTo, encrypted);
